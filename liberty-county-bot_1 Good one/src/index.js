@@ -58,8 +58,6 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildVoiceStates,
   ],
   partials: [Partials.Channel, Partials.Message],
 });
@@ -99,7 +97,14 @@ client.once('ready', async () => {
 });
 
 client.on('error', (err) => console.error('[client error]', err));
+client.on('warn', (message) => console.warn('[client warning]', message));
+client.on('shardError', (err) => console.error('[gateway error]', err));
+client.on('shardDisconnect', (event, shardId) => {
+  console.error(`[gateway disconnect] shard ${shardId} closed with code ${event.code}: ${event.reason || 'no reason provided'}`);
+});
+client.on('shardReconnecting', (shardId) => console.warn(`[gateway reconnecting] shard ${shardId}`));
 
+console.log('[startup] Connecting to Discord Gateway...');
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
   console.error('\n=== LOGIN FAILED ===');
   console.error(`  ${err.message}`);
