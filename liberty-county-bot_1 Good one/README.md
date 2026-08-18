@@ -1,7 +1,8 @@
 # Liberty County Platform Bot
 
 A modular Discord management platform, built with discord.js v14 (Components V2),
-better-sqlite3, and a module-registry architecture so new features drop in as
+Node's built-in SQLite (no native module, no build step), and a
+module-registry architecture so new features drop in as
 self-contained folders.
 
 ## What's actually implemented right now
@@ -197,8 +198,22 @@ time it's unset so you don't forget to lock it down before going live.
 
 This is built to work as a Render **Web Service** (not Background
 Worker) out of the box:
-- `npm start` is the start command Render should use (already the
-  `package.json` default).
+- **Build Command:** set this explicitly to `npm install` in your
+  Render service's Settings, not `npm ci`. Render's default Node
+  behavior can prefer `npm ci` when it sees a lockfile, and `npm ci` is
+  strict about the lockfile being byte-for-byte in sync -- `npm install`
+  isn't and is the safer choice here. If your build ever fails with npm
+  dumping a wall of `npm error --omit / --include / --strict-peer-deps...`
+  usage text instead of a real error message, that's `npm ci` complaining
+  about the lockfile -- switching the Build Command to `npm install`
+  fixes it.
+- **Start Command:** `npm start` (already the `package.json` default).
+- **Node version:** 22.5 or newer (set via Render's environment/runtime
+  settings, or a `.node-version` file) -- this project uses Node's
+  built-in `node:sqlite` instead of a compiled native module specifically
+  so there's nothing to build on deploy. You'll see one harmless
+  `ExperimentalWarning: SQLite is an experimental feature` line in the
+  logs on every boot; that's expected and not an error.
 - Render sets `PORT` automatically; `src/core/httpServer.js` binds to it
   and answers `GET /` with `200 {"status":"ok"}` the moment the process
   boots -- this is what keeps Render's health check green even before

@@ -1,13 +1,23 @@
-const Database = require('better-sqlite3');
+// Uses Node's built-in SQLite (node:sqlite, stable since Node 22.5+) instead
+// of a third-party native module. This is a deliberate choice for
+// deployability: better-sqlite3 has no prebuilt binaries for current Node
+// versions and always needs to compile from source on install, which is
+// exactly the kind of thing that breaks a Render (or any PaaS) build in
+// ways that are painful to debug. node:sqlite ships inside Node itself --
+// zero native compilation, zero install-time risk. The API below
+// (prepare/run/get/all, named @params, PRAGMA via exec, multi-statement
+// exec, ON CONFLICT upserts, lastInsertRowid) is a near-drop-in match for
+// better-sqlite3's, all verified working before this migration was made.
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
 const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new Database(path.join(DATA_DIR, 'platform.sqlite'));
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const db = new DatabaseSync(path.join(DATA_DIR, 'platform.sqlite'));
+db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA foreign_keys = ON');
 
 // ---------------------------------------------------------------------------
 // Core schema. Every table is namespaced by guild_id so the bot is fully
