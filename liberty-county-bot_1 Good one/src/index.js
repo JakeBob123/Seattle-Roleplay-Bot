@@ -96,7 +96,6 @@ client.once('ready', async () => {
 
 client.on('error', (err) => console.error('[client error]', err));
 client.on('warn', (message) => console.warn('[client warning]', message));
-client.on('debug', (message) => console.log('[discord debug]', message));
 client.on('shardError', (err) => console.error('[gateway error]', err));
 client.on('shardDisconnect', (event, shardId) => {
   console.error(`[gateway disconnect] shard ${shardId} closed with code ${event.code}: ${event.reason || 'no reason provided'}`);
@@ -110,12 +109,30 @@ const loginTimeout = setTimeout(() => {
   process.exit(1);
 }, 30000);
 
-client.login(process.env.DISCORD_TOKEN).then(() => clearTimeout(loginTimeout)).catch((err) => {
-  clearTimeout(loginTimeout);
-  console.error('\n=== LOGIN FAILED ===');
-  console.error(`  ${err.message}`);
-  console.error('This almost always means DISCORD_TOKEN in .env is wrong, expired, or was reset in the Developer Portal.\n');
-  process.exit(1);
-});
+const discordApiCheck = new AbortController();
+const discordApiTimeout = setTimeout(() => discordApiCheck.abort(), 10000);
+
+fetch('https://discord.com/api/v10/gateway', {
+  headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` },
+  signal: discordApiCheck.signal,
+})
+  .then(async (response) => {
+    if (!response.ok) {
+      throw new Error(`Discord API returned HTTP ${response.status} during connectivity check`);
+    }
+    console.log('[startup] Discord API reachable; starting Gateway login.');
+    return client.login(process.env.DISCORD_TOKEN);
+  })
+  .catch((err) => {
+    const message = err.name === 'AbortError'
+      ? 'Discord API connectivity check timed out after 10 seconds.'
+      : err.message;
+    clearTimeout(loginTimeout);
+    console.error(`\n=== DISCORD CONNECTION FAILED ===\n  ${message}\n`);
+    process.exit(1);
+  })
+  .finally(() => clearTimeout(discordApiTimeout));
+
+client.once('ready', () => clearTimeout(loginTimeout));
 
 process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', err));
