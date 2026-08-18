@@ -96,6 +96,7 @@ client.once('ready', async () => {
 
 client.on('error', (err) => console.error('[client error]', err));
 client.on('warn', (message) => console.warn('[client warning]', message));
+client.on('debug', (message) => console.log('[discord debug]', message));
 client.on('shardError', (err) => console.error('[gateway error]', err));
 client.on('shardDisconnect', (event, shardId) => {
   console.error(`[gateway disconnect] shard ${shardId} closed with code ${event.code}: ${event.reason || 'no reason provided'}`);
@@ -103,7 +104,14 @@ client.on('shardDisconnect', (event, shardId) => {
 client.on('shardReconnecting', (shardId) => console.warn(`[gateway reconnecting] shard ${shardId}`));
 
 console.log('[startup] Connecting to Discord Gateway...');
-client.login(process.env.DISCORD_TOKEN).catch((err) => {
+const loginTimeout = setTimeout(() => {
+  console.error('\n=== LOGIN TIMEOUT ===');
+  console.error('Discord did not complete the Gateway handshake within 30 seconds. Check DISCORD_TOKEN and Discord Gateway availability.\n');
+  process.exit(1);
+}, 30000);
+
+client.login(process.env.DISCORD_TOKEN).then(() => clearTimeout(loginTimeout)).catch((err) => {
+  clearTimeout(loginTimeout);
   console.error('\n=== LOGIN FAILED ===');
   console.error(`  ${err.message}`);
   console.error('This almost always means DISCORD_TOKEN in .env is wrong, expired, or was reset in the Developer Portal.\n');
