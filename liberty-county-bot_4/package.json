@@ -1,0 +1,17 @@
+{
+  "name": "liberty-county-bot",
+  "version": "1.0.0",
+  "description": "Liberty County community management platform for Discord.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
