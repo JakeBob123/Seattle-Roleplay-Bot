@@ -1,4 +1,5 @@
-// Uses Node's built-in SQLite (node:sqlite, stable since Node 22.5+) instead
+// Uses Node's built-in SQLite (node:sqlite, available without an experimental
+// flag since Node 22.13+) instead
 // of a third-party native module. This is a deliberate choice for
 // deployability: better-sqlite3 has no prebuilt binaries for current Node
 // versions and always needs to compile from source on install, which is

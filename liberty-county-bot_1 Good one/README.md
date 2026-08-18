@@ -208,7 +208,7 @@ Worker) out of the box:
   about the lockfile -- switching the Build Command to `npm install`
   fixes it.
 - **Start Command:** `npm start` (already the `package.json` default).
-- **Node version:** 22.5 or newer (set via Render's environment/runtime
+- **Node version:** 22.13 or newer (set via Render's environment/runtime
   settings, or a `.node-version` file) -- this project uses Node's
   built-in `node:sqlite` instead of a compiled native module specifically
   so there's nothing to build on deploy. You'll see one harmless
