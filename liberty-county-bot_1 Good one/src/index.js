@@ -116,11 +116,17 @@ fetch('https://discord.com/api/v10/gateway', {
   headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` },
   signal: discordApiCheck.signal,
 })
-  .then(async (response) => {
-    if (!response.ok) {
+  .then((response) => {
+    if (response.status === 401 || response.status === 403) {
       throw new Error(`Discord API returned HTTP ${response.status} during connectivity check`);
     }
-    console.log('[startup] Discord API reachable; starting Gateway login.');
+    if (response.status === 429) {
+      console.warn('[startup] Discord API rate-limited the connectivity check; continuing with Gateway login.');
+    } else if (!response.ok) {
+      throw new Error(`Discord API returned HTTP ${response.status} during connectivity check`);
+    } else {
+      console.log('[startup] Discord API reachable; starting Gateway login.');
+    }
     return client.login(process.env.DISCORD_TOKEN);
   })
   .catch((err) => {
