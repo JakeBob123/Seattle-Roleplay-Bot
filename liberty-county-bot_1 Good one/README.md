@@ -180,9 +180,7 @@ time it's unset so you don't forget to lock it down before going live.
 1. https://discord.com/developers/applications -> your application (or
    **New Application** if you haven't made one).
 2. **Bot** tab -> **Reset Token** -> copy it into `DISCORD_TOKEN`.
-3. Same **Bot** tab, under **Privileged Gateway Intents**, turn on:
-   - **Server Members Intent** -- required for moderation and the welcome module
-4. **OAuth2 -> URL Generator**: check the `bot` and `applications.commands`
+3. **OAuth2 -> URL Generator**: check the `bot` and `applications.commands`
    scopes. Under Bot Permissions, at minimum: Manage Roles, Manage
    Channels, Kick Members, Ban Members, Moderate Members, Manage Emojis
    and Stickers, Send Messages, Embed Links, Attach Files, Read Message

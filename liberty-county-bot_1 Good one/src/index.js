@@ -56,8 +56,6 @@ validateEnv();
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessages,
   ],
   partials: [Partials.Channel, Partials.Message],
 });
