@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: liberty-county-bot
+    runtime: node
+    rootDir: "liberty-county-bot_1 Good one"
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.5.0
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: ALLOWED_GUILD_IDS
+        sync: false
+      - key: PUBLIC_WEBHOOK_BASE_URL
+        sync: false
